@@ -114,11 +114,16 @@ if [[ $INSTALL_CHOICE =~ ^[Yy](es)?$ ]]; then
         ((COUNTER++))
     done
 
-    # Prompt the user to enter the VPC name, SSH key username, Tailscale API Access Token, and Cloudflare Global API Access Token
+    # Prompt the user to enter the VPC name, SSH key username, Tailscale API Access Token, Cloudflare Global API Access Token and Cloudflare Email
     prompt_for_input "Enter your Google Cloud VPC name (leave blank for 'default'):" "YOUR_VPC" true
     prompt_for_input "Enter your SSH key username (the username you use to SSH into your VM, usually appears before the '@' in your SSH command):" "SSH_KEY_USERNAME"
     prompt_for_input "Enter your Tailscale API Access Token (get it here: https://login.tailscale.com/admin/authkeys):" "TAILSCALE_API_ACCESS_TOKEN"
     prompt_for_input "Enter your Cloudflare Global API Access Token (get it here: https://developers.cloudflare.com/fundamentals/api/get-started/keys/):" "CLOUDFLARE_API_ACCESS_TOKEN"
+    prompt_for_input "Enter the email address you sign in to Cloudflare with:" "CLOUDFLARE_EMAIL"
+
+    # Message indicating the transition to configuring the server and running setup_GCPTailWall.sh
+    printf "\n${GREEN}We've collected all the necessary information. Now proceeding to configure the server and run setup_GCPTailWall.sh.${NC}\n"
+
 
     # If setup_tailscale.sh exists, make it executable and run it
     if [ -f "$SCRIPT_DIR/setup_tailscale.sh" ]; then
