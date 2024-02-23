@@ -118,7 +118,7 @@ if [[ $INSTALL_CHOICE =~ ^[Yy](es)?$ ]]; then
     prompt_for_input "Enter your Google Cloud VPC name (leave blank for 'default'):" "YOUR_VPC" true
     prompt_for_input "Enter your SSH key username (the username you use to SSH into your VM, usually appears before the '@' in your SSH command):" "SSH_KEY_USERNAME"
     prompt_for_input "Enter your Tailscale API Access Token (get API here: https://login.tailscale.com/admin/authkeys):" "TAILSCALE_API_ACCESS_TOKEN"
-    prompt_for_input "Enter your Cloudflare Global API Access Token (get Global API here: https://developers.cloudflare.com/fundamentals/api/get-started/keys/):" "CLOUDFLARE_GLOBAL_API_KEY"
+    prompt_for_input "Enter your Cloudflare API Access Token (get Global API here: https://developers.cloudflare.com/fundamentals/api/get-started/create-token//):" "CLOUDFLARE_API_ACCESS_TOKEN"
     prompt_for_input "Enter your Cloudflare ZoneID (get ZoneID here: https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/):" "CLOUDFLARE_ZONE_ID"
     prompt_for_input "Enter the email address you sign in to Cloudflare with:" "CLOUDFLARE_EMAIL"
 
