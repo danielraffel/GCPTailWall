@@ -103,12 +103,14 @@ gcloud compute firewall-rules create tailscaleipv4 --direction=INGRESS --priorit
 gcloud compute firewall-rules create tailscaleipv6 --direction=INGRESS --priority=1000 \
   --network="$YOUR_VPC" --action=ALLOW --rules=udp:41641 --source-ranges=::/0 --project="$PROJECT_ID"
 
-# Setup firewall rules on GCP for hostnames
+# Setup firewall rules on GCP for each TCP port
 echo "Setting up firewall rules on GCP for each TCP port..."
 for i in $(seq 1 $(grep -c 'HOSTNAME_' variables.txt)); do
     HOST_VAR="HOSTNAME_$i"
     PORT_VAR="TCP_PORT_$i"
-    gcloud compute firewall-rules create "${!HOST_VAR}" --direction=INGRESS --priority=1000 \
+    # Convert hostname to comply with GCP naming conventions: lowercase and replace dots with hyphens
+    GCP_SAFE_NAME=$(echo "${!HOST_VAR}" | tr '.' '-' | tr '[:upper:]' '[:lower:]')
+    gcloud compute firewall-rules create "$GCP_SAFE_NAME" --direction=INGRESS --priority=1000 \
       --network="$YOUR_VPC" --action=ALLOW --rules=tcp:"${!PORT_VAR}" --source-ranges=0.0.0.0/0 --project="$PROJECT_ID"
 done
 
