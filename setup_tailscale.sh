@@ -132,10 +132,10 @@ for i in $(seq 1 $(grep -c 'HOSTNAME_' variables.txt)); do
     HOST_VAR="HOSTNAME_$i"
     # Use Cloudflare API to create DNS record
     curl --request POST \
-      --url https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records \
-      --header "Content-Type: application/json" \
-      --header "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-      --header "X-Auth-Key: $CLOUDFLARE_GLOBAL_API_KEY" \
+      --url https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records \
+      --header 'Content-Type: application/json' \
+      --header 'X-Auth-Email: $CLOUDFLARE_EMAIL' \
+      --header 'X-Auth-Key: $CLOUDFLARE_GLOBAL_API_KEY' \
       --data "{\"type\":\"A\",\"name\":\"${!HOST_VAR}\",\"content\":\"$TAILSCALE_IP\",\"ttl\":3600,\"proxied\":false}"
 done
 
