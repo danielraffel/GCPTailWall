@@ -12,10 +12,10 @@ The process of [setting up Tailscale on your VM](https://tailscale.com/kb/1147/c
 
 - A VM running Ubuntu 22.04 on Google Cloud Platform
 - GCP CLI installed on your VM (usually installed by default)
-- Git installed on your VM
-- Tailscale account
+- Git installed on your VM (usually installed by default)
+- [Tailscale account](https://tailscale.com)
 - [Tailscale API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/keys/)
-- Cloudflare Account with a hosted domain
+- [Cloudflare Account](https://www.cloudflare.com) with a hosted domain
 - [Cloudflare Global API Access Token](https://login.tailscale.com/admin/authkeys)
 
 ## Quick Start
