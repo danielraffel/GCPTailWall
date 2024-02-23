@@ -10,7 +10,8 @@ The process of [setting up Tailscale on your VM](https://tailscale.com/kb/1147/c
 
 ## Prerequisites
 
-- SSH access to a VM running Ubuntu 22.04 on Google Cloud Platform with its access scopes set to `Allow full access to all Cloud APls`. You may need to stop the VM to edit Access scopes to enable this option.
+- SSH access to a VM running Ubuntu 22.04 on Google Cloud Platform.
+- The access scopes for the VM need to be configured to `Allow full access to all Cloud APIs`. As this is not the default configuration, you might have to stop the VM to modify the `Access scopes` settings to activate this feature, before you can restart the VM and run these scripts.
 - GCP CLI installed on your VM (usually installed by default)
 - Git installed on your VM (usually installed by default)
 - [Tailscale account](https://tailscale.com)
