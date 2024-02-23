@@ -16,8 +16,9 @@ The process of [setting up Tailscale on your VM](https://tailscale.com/kb/1147/c
 - Git installed on your VM (usually installed by default)
 - [Tailscale account](https://tailscale.com)
 - [Tailscale API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/keys/)
-- [Cloudflare Account](https://www.cloudflare.com) with a hosted domain
-- [Cloudflare Global API Access Token](https://login.tailscale.com/admin/authkeys)
+- [Cloudflare Account](https://www.cloudflare.com) with a hosted domain (you'll need to provide the email address you sign in with)
+- [Cloudflare API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
+- [Cloudflare ZoneID](https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/)
 
 ## Quick Start
 
@@ -63,7 +64,7 @@ During the `setup.sh` execution, you'll be prompted to enter the following:
 - Your Google Cloud VPC name (default is used if left blank).
 - Your SSH key username.
 - Tailscale API Access Token (obtain from [Tailscale Admin](https://login.tailscale.com/admin/authkeys)).
-- Cloudflare Global API Access Token (obtain from [Cloudflare API Tokens](https://developers.cloudflare.com/fundamentals/api/get-started/keys/)).
+- Cloudflare API Access Token (obtain from [Cloudflare API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)).
 - Cloudflare Email address
 
 After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with the configurations you provided.
