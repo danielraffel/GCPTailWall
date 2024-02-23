@@ -49,28 +49,25 @@ The process of [setting up Tailscale on your VM](https://tailscale.com/kb/1147/c
 
 ## What `setup_GCPTailWall.sh` Does
 
-- **Tailscale Configuration:** Configures your VM with Tailscale for secure, private networking.
+- **Tailscale Configuration:** Configures your VM with Tailscale for secure, private networking. You'll be prompted to copy a link to your browser to approve this.
 - **UFW Configuration:** Locks down the VM with UFW (Uncomplicated Firewall), making it accessible only via the Tailscale network. Port 22 is left open for SSH access.
 - **GCP Firewall Rules:** Opens necessary firewall rules on GCP to ensure Tailscale and specified services running on the hostnames can communicate.
-- **Caddy Reverse Proxy:** Uses Caddy to proxy requests to your services based on hostnames and ports you specify.
+- **Caddy Reverse Proxy:** Configures Caddy to proxy requests to your services based on the hostnames and ports you specify.
 - **Cloudflare DNS Management:** Sets up DNS entries on Cloudflare for your services, using the hostnames you provide and directs to your TailscaleIP.
 
 ## Configuration Prompts
 
-During the `setup.sh` execution, you'll be prompted to enter:
+During the `setup.sh` execution, you'll be prompted to enter the following:
 
 - Custom hostnames for your services and their corresponding TCP port. You can create one or multiple.
 - Your Google Cloud VPC name (default is used if left blank).
-- Your SSH key username (used for SSH into your VM).
+- Your SSH key username.
 - Tailscale API Access Token (obtain from [Tailscale Admin](https://login.tailscale.com/admin/authkeys)).
 - Cloudflare Global API Access Token (obtain from [Cloudflare API Tokens](https://developers.cloudflare.com/fundamentals/api/get-started/keys/)).
+- Cloudflare Email address
 
-After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with the provided configurations.
+After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with the configurations you provided.
 
 ## Why jq is Installed
 
 `[jq](https://manpages.ubuntu.com/manpages/xenial/man1/jq.1.html)` is installed as part of the setup to process JSON data, which is necessary for interacting with Tailscale and Cloudflare APIs during the setup process.
-
-## Important Notes
-
-- This setup assumes you have GCP CLI installed on your VM. The script does not check for its presence.
