@@ -9,6 +9,6 @@ TCP_PORT_2=3000
 YOUR_VPC=default
 SSH_KEY_USERNAME=john_smith
 TAILSCALE_API_ACCESS_TOKEN=https://login.tailscale.com/admin/authkeys
-CLOUDFLARE_GLOBAL_API_KEY=https://developers.cloudflare.com/fundamentals/api/get-started/keys/
+CLOUDFLARE_API_ACCESS_TOKEN=https://developers.cloudflare.com/fundamentals/api/get-started/create-token/
 CLOUDFLARE_ZONE_ID=https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/
 CLOUDFLARE_EMAIL=john@example.com
