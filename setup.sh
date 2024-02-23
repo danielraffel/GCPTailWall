@@ -13,11 +13,11 @@ SCRIPT_DIR=$(dirname "$0")
 if [[ -s "$SCRIPT_DIR/variables.txt" ]]; then
     printf "\n${GREEN}Found existing 'variables.txt'. Skipping setup questions and proceeding with Tailscale setup.${NC}\n"
     source "$SCRIPT_DIR/variables.txt"
-    if [ -f "$SCRIPT_DIR/setup_GCPTailWall.sh" ]; then
-        chmod +x "$SCRIPT_DIR/setup_GCPTailWall.sh"
-        "$SCRIPT_DIR/setup_GCPTailWall.sh"
+    if [ -f "$SCRIPT_DIR/setup_tailscale.sh" ]; then
+        chmod +x "$SCRIPT_DIR/setup_tailscale.sh"
+        "$SCRIPT_DIR/setup_tailscale.sh"
     else
-        printf "\n${RED}'setup_GCPTailWall.sh' not found in the script directory.${NC}\n"
+        printf "\n${RED}'setup_tailscale.sh' not found in the script directory.${NC}\n"
     fi
     exit 0
 fi
@@ -117,20 +117,21 @@ if [[ $INSTALL_CHOICE =~ ^[Yy](es)?$ ]]; then
     # Prompt the user to enter the VPC name, SSH key username, Tailscale API Access Token, Cloudflare Global API Access Token and Cloudflare Email
     prompt_for_input "Enter your Google Cloud VPC name (leave blank for 'default'):" "YOUR_VPC" true
     prompt_for_input "Enter your SSH key username (the username you use to SSH into your VM, usually appears before the '@' in your SSH command):" "SSH_KEY_USERNAME"
-    prompt_for_input "Enter your Tailscale API Access Token (get it here: https://login.tailscale.com/admin/authkeys):" "TAILSCALE_API_ACCESS_TOKEN"
-    prompt_for_input "Enter your Cloudflare Global API Access Token (get it here: https://developers.cloudflare.com/fundamentals/api/get-started/keys/):" "CLOUDFLARE_API_ACCESS_TOKEN"
+    prompt_for_input "Enter your Tailscale API Access Token (get API here: https://login.tailscale.com/admin/authkeys):" "TAILSCALE_API_ACCESS_TOKEN"
+    prompt_for_input "Enter your Cloudflare Global API Access Token (get Global API here: https://developers.cloudflare.com/fundamentals/api/get-started/keys/):" "CLOUDFLARE_API_ACCESS_TOKEN"
+    prompt_for_input "Enter your Cloudflare ZoneID (get ZoneID here: https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/):" "CLOUDFLARE_ZONE_ID"
     prompt_for_input "Enter the email address you sign in to Cloudflare with:" "CLOUDFLARE_EMAIL"
 
-    # Message indicating the transition to configuring the server and running setup_GCPTailWall.sh
-    printf "\n${GREEN}We've collected all the necessary information. Now proceeding to configure the server and run setup_GCPTailWall.sh.${NC}\n"
+    # Message indicating the transition to configuring the server and running setup_tailscale.sh
+    printf "\n${GREEN}We've collected all the necessary information. Now proceeding to configure the server and run setup_tailscale.sh.${NC}\n"
 
 
-    # If setup_GCPTailWall.sh exists, make it executable and run it
-    if [ -f "$SCRIPT_DIR/setup_GCPTailWall.sh" ]; then
-        chmod +x "$SCRIPT_DIR/setup_GCPTailWall.sh"
-        . "$SCRIPT_DIR/setup_GCPTailWall.sh"
+    # If setup_tailscale.sh exists, make it executable and run it
+    if [ -f "$SCRIPT_DIR/setup_tailscale.sh" ]; then
+        chmod +x "$SCRIPT_DIR/setup_tailscale.sh"
+        . "$SCRIPT_DIR/setup_tailscale.sh"
     else
-        printf "\n${RED}'setup_GCPTailWall.sh' not found in the current directory.${NC}\n"
+        printf "\n${RED}'setup_tailscale.sh' not found in the current directory.${NC}\n"
     fi
 else
     printf "\n${RED}Tailscale installation aborted.${NC}\n"
