@@ -13,11 +13,11 @@ SCRIPT_DIR=$(dirname "$0")
 if [[ -s "$SCRIPT_DIR/variables.txt" ]]; then
     printf "\n${GREEN}Found existing 'variables.txt'. Skipping setup questions and proceeding with Tailscale setup.${NC}\n"
     source "$SCRIPT_DIR/variables.txt"
-    if [ -f "$SCRIPT_DIR/setup_tailscale.sh" ]; then
-        chmod +x "$SCRIPT_DIR/setup_tailscale.sh"
-        "$SCRIPT_DIR/setup_tailscale.sh"
+    if [ -f "$SCRIPT_DIR/setup_GCPTailWall.sh" ]; then
+        chmod +x "$SCRIPT_DIR/setup_GCPTailWall.sh"
+        "$SCRIPT_DIR/setup_GCPTailWall.sh"
     else
-        printf "\n${RED}'setup_tailscale.sh' not found in the script directory.${NC}\n"
+        printf "\n${RED}'setup_GCPTailWall.sh' not found in the script directory.${NC}\n"
     fi
     exit 0
 fi
@@ -77,11 +77,11 @@ if [[ $INSTALL_CHOICE =~ ^[Yy](es)?$ ]]; then
     prompt_for_input "Enter your Tailscale API Access Token (get it here: https://login.tailscale.com/admin/authkeys):" "TAILSCALE_API_ACCESS_TOKEN"
     prompt_for_input "Enter your Cloudflare Global API Access Token (get it here: https://developers.cloudflare.com/fundamentals/api/get-started/keys/):" "CLOUDFLARE_API_ACCESS_TOKEN"
 
-    if [ -f "$SCRIPT_DIR/setup_tailscale.sh" ]; then
-        chmod +x "$SCRIPT_DIR/setup_tailscale.sh"
-        . "$SCRIPT_DIR/setup_tailscale.sh"
+    if [ -f "$SCRIPT_DIR/setup_GCPTailWall.sh" ]; then
+        chmod +x "$SCRIPT_DIR/setup_GCPTailWall.sh"
+        . "$SCRIPT_DIR/setup_GCPTailWall.sh"
     else
-        printf "\n${RED}'setup_tailscale.sh' not found in the current directory.${NC}\n"
+        printf "\n${RED}'setup_GCPTailWall.sh' not found in the current directory.${NC}\n"
     fi
 else
     printf "\n${RED}Tailscale installation aborted.${NC}\n"
