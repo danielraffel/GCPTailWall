@@ -135,7 +135,7 @@ curl --request POST \
   --url https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records \
   --header "Content-Type: application/json" \
   --header "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-  --header "X-Auth-Key: $CLOUDFLARE_GLOBAL_API_KEY" \
+  --header "X-Auth-Key: $CLOUDFLARE_API_ACCESS_TOKEN" \
   --data "{\"type\":\"A\",\"name\":\"${!HOST_VAR}\",\"content\":\"$TAILSCALE_IP\",\"ttl\":3600,\"proxied\":false}"
 done
 
