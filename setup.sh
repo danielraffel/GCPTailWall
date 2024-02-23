@@ -125,7 +125,7 @@ if [[ $INSTALL_CHOICE =~ ^[Yy](es)?$ ]]; then
     printf "\n${GREEN}We've collected all the necessary information. Now proceeding to configure the server and run setup_GCPTailWall.sh.${NC}\n"
 
 
-    # If setup_tailscale.sh exists, make it executable and run it
+    # If setup_GCPTailWall.sh exists, make it executable and run it
     if [ -f "$SCRIPT_DIR/setup_GCPTailWall.sh" ]; then
         chmod +x "$SCRIPT_DIR/setup_GCPTailWall.sh"
         . "$SCRIPT_DIR/setup_GCPTailWall.sh"
