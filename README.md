@@ -60,12 +60,13 @@ The process of [setting up Tailscale on your VM](https://tailscale.com/kb/1147/c
 
 During the `setup.sh` execution, you'll be prompted to enter the following:
 
-- Custom hostnames for your services and their corresponding TCP port. You can create one or multiple.
-- Your Google Cloud VPC name (default is used if left blank).
+- Custom hostnames for your services and their corresponding TCP port. You can create one or multiple
+- Your Google Cloud VPC name (default is used if left blank)
 - Your SSH key username.
-- Tailscale API Access Token (obtain from [Tailscale Admin](https://login.tailscale.com/admin/authkeys)).
-- Cloudflare API Access Token (obtain from [Cloudflare API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)).
-- Cloudflare Email address
+- Tailscale API Access Token (obtain from [Tailscale Admin](https://login.tailscale.com/admin/authkeys))
+- Cloudflare API Access Token (obtain from [Cloudflare API Access Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)) * Instructions below
+- Cloudflare Zone ID (obtain from [ZoneID](https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/)
+- Email address used to sign in to Cloudflare
 
 After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with the configurations you provided.
 
@@ -74,6 +75,16 @@ After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with
 `[jq](https://manpages.ubuntu.com/manpages/xenial/man1/jq.1.html)` is installed as part of the setup to process JSON data, which is necessary for interacting with Tailscale and Cloudflare APIs during the setup process.
 
 ## Important Notes
-- If you've not used certain Google Cloud APIs the Google CLI might ask you to enable them and retry again.
-- If you're getting permission errors such as "Request had insufficient authentication scopes" then you probably did not enable the Access Scopes. To fix this go to GCP Console > [Compute Engine](https://console.cloud.google.com/compute/) and then stop the VM you want to install this script on. Once stopped, select `edit` and scroll down to `Access scopes` and select `Allow full access to all Cloud APIs` then press `save` and restart the VM. You need to do this for the Google CLI to have the ability to perform lots of API calls on your behalf.
-- The file `example.variables.txt` includes all possible variables that `setup.sh` creates within `variables.txt`. If you prefer to manually create the file, you can then run `setup_tailscale.sh` with `sudo bash setup_tailscale.sh`.
+1. If you've not used certain Google Cloud APIs the Google CLI might ask you to enable them and retry again.
+2. If you're getting permission errors such as "Request had insufficient authentication scopes" then you probably did not enable the Access Scopes. To fix this go to GCP Console > [Compute Engine](https://console.cloud.google.com/compute/) and then stop the VM you want to install this script on. Once stopped, select `edit` and scroll down to `Access scopes` and select `Allow full access to all Cloud APIs` then press `save` and restart the VM. You need to do this for the Google CLI to have the ability to perform lots of API calls on your behalf.
+3. The file `example.variables.txt` includes all possible variables that `setup.sh` creates within `variables.txt`. If you prefer to manually create the file, you can then run `setup_tailscale.sh` with `sudo bash setup_tailscale.sh`.
+4 If you're having a hard time Creating a Cloudflare API Token
+* Log in to your Cloudflare dashboard.
+* Navigate to My Profile > API Tokens.
+* Click Create Token.
+* Use the "Edit zone DNS" template as a starting point.
+* Set permissions to Zone > DNS > Edit.
+* Include all the zones you want Caddy to be able to issue certificates for, or select "Include all zones" if you prefer.
+* Complete the token creation process.
+
+
