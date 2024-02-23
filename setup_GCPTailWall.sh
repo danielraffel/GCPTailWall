@@ -20,7 +20,7 @@ curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | sudo tee
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
 
 echo "Installing Tailscale..."
-sudo apt-get update && sudo apt-get install tailscale
+sudo apt-get update && sudo apt-get install tailscale -y
 
 # Install Caddy
 echo "Installing Caddy..."
@@ -30,15 +30,18 @@ sudo apt-get update && sudo apt-get install caddy -y
 
 # Modify Caddyfile
 echo "Modifying /etc/caddy/Caddyfile with reverse proxy settings..."
+sudo cp /dev/null /etc/caddy/Caddyfile # Clear existing Caddyfile contents before appending
 {
-    echo "" # Ensure there's a newline before we start appending
-    for i in $(seq 1 $(grep -c 'HOSTNAME_' variables.txt)); do
-        HOST_VAR="HOSTNAME_$i"
-        PORT_VAR="TCP_PORT_$i"
-        echo "\${!HOST_VAR} {
-    reverse_proxy localhost:\${!PORT_VAR}
+    while read -r line; do
+        if [[ "$line" =~ ^HOSTNAME_([0-9]+)=(.*)$ ]]; then
+            hostname=${BASH_REMATCH[2]}
+            varname="TCP_PORT_${BASH_REMATCH[1]}"
+            port=${!varname}
+            echo "$hostname {
+    reverse_proxy localhost:$port
 }"
-    done
+        fi
+    done < variables.txt
 } | sudo tee -a /etc/caddy/Caddyfile
 
 # Reload Caddy to apply the new configuration
