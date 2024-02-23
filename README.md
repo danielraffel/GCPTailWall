@@ -71,3 +71,7 @@ After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with
 ## Why jq is Installed
 
 `[jq](https://manpages.ubuntu.com/manpages/xenial/man1/jq.1.html)` is installed as part of the setup to process JSON data, which is necessary for interacting with Tailscale and Cloudflare APIs during the setup process.
+
+## Important Notes
+- If you've not used certain Google Cloud APIs the Google CLI might ask you to enable them and retry again.
+- If you're getting permission errors such as "Request had insufficient authentication scopes" then you probably did not enable the Access Scopes. To fix this go to GCP Console > [Compute Engine](https://console.cloud.google.com/compute/) and then stop the VM you want to install this script on. Once stopped, select `edit` and scroll down to `Access scopes` and select `Allow full access to all Cloud APIs` then press `save` and restart the VM. You need to do this for the Google CLI to have the ability to perform lots of API calls on your behalf.
