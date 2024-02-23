@@ -68,7 +68,7 @@ After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with
 
 ## Why jq is Installed
 
-`jq` is installed as part of the setup to process JSON data, which is necessary for interacting with Tailscale and Cloudflare APIs during the setup process.
+`[jq](https://manpages.ubuntu.com/manpages/xenial/man1/jq.1.html)` is installed as part of the setup to process JSON data, which is necessary for interacting with Tailscale and Cloudflare APIs during the setup process.
 
 ## Important Notes
 
