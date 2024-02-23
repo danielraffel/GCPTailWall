@@ -1,0 +1,14 @@
+VM_NAME=tesla-example-com
+ZONE=us-west1-b
+PROJECT_ID=alien-rocket-331666
+VM_SUBNET=10.152.0.0/20
+HOSTNAME_1=tesla.example.com
+TCP_PORT_1=4000
+HOSTNAME_2=grafana.example.com
+TCP_PORT_2=3000
+YOUR_VPC=default
+SSH_KEY_USERNAME=john_smith
+TAILSCALE_API_ACCESS_TOKEN=https://login.tailscale.com/admin/authkeys
+CLOUDFLARE_GLOBAL_API_KEY=https://developers.cloudflare.com/fundamentals/api/get-started/keys/
+CLOUDFLARE_ZONE_ID=https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/
+CLOUDFLARE_EMAIL=john@example.com
