@@ -28,17 +28,48 @@ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo tee /et
 echo "deb https://dl.cloudsmith.io/public/caddy/stable/deb/debian buster main" | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 sudo apt-get update && sudo apt-get install caddy -y
 
-# Modify Caddyfile
-echo "Modifying /etc/caddy/Caddyfile with reverse proxy settings..."
+# Initialize variable
+CLOUDFLARE_API_ACCESS_TOKEN=""
+
+# Load Cloudflare API token from variables.txt
+while IFS='=' read -r key value; do
+    if [[ "$key" == "CLOUDFLARE_API_ACCESS_TOKEN" ]]; then
+        CLOUDFLARE_API_ACCESS_TOKEN="$value"
+    fi
+done < variables.txt
+
+# Check if the token was found
+if [ -z "$CLOUDFLARE_API_ACCESS_TOKEN" ]; then
+    echo "CLOUDFLARE_API_ACCESS_TOKEN not found in variables.txt"
+    exit 1
+fi
+
+# Use systemctl edit to create an override file for Caddy
+echo -e "[Service]\nEnvironment=\"CLOUDFLARE_API_ACCESS_TOKEN=$CLOUDFLARE_API_ACCESS_TOKEN\"" | sudo SYSTEMD_EDITOR="tee" systemctl edit caddy
+
+# Reload systemd to apply changes and restart Caddy service
+sudo systemctl daemon-reload
+sudo systemctl restart caddy
+
+echo "Caddy service has been updated and restarted with the new Cloudflare API Access Token."
+
+# Modify Caddyfile with reverse proxy settings and Cloudflare DNS challenge
+echo "Modifying /etc/caddy/Caddyfile with reverse proxy settings and Cloudflare DNS challenge..."
 sudo cp /dev/null /etc/caddy/Caddyfile # Clear existing Caddyfile contents before appending
+
+# Loop through variables.txt to configure each site
 {
-    while read -r line; do
+    while IFS= read -r line; do
         if [[ "$line" =~ ^HOSTNAME_([0-9]+)=(.*)$ ]]; then
             hostname=${BASH_REMATCH[2]}
             varname="TCP_PORT_${BASH_REMATCH[1]}"
             port=${!varname}
+            # Append site configuration with reverse proxy and TLS using DNS challenge
             echo "$hostname {
     reverse_proxy localhost:$port
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_ACCESS_TOKEN}
+    }
 }"
         fi
     done < variables.txt
@@ -47,6 +78,8 @@ sudo cp /dev/null /etc/caddy/Caddyfile # Clear existing Caddyfile contents befor
 # Reload Caddy to apply the new configuration
 echo "Reloading Caddy to apply configuration changes..."
 sudo systemctl reload caddy
+sudo caddy fmt --overwrite /etc/caddy/Caddyfile
+sudo caddy reload --config /etc/caddy/Caddyfile
 
 # Install jq
 echo "Installing jq..."
