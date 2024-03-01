@@ -78,7 +78,7 @@ After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with
 1. If you've not used certain Google Cloud APIs the Google CLI might ask you to enable them and retry again.
 2. If you're getting permission errors such as "Request had insufficient authentication scopes" then you probably did not enable the Access Scopes. To fix this go to GCP Console > [Compute Engine](https://console.cloud.google.com/compute/) and then stop the VM you want to install this script on. Once stopped, select `edit` and scroll down to `Access scopes` and select `Allow full access to all Cloud APIs` then press `save` and restart the VM. You need to do this for the Google CLI to have the ability to perform lots of API calls on your behalf.
 3. The file `example.variables.txt` includes all possible variables that `setup.sh` creates within `variables.txt`. If you prefer to manually create the file, you can then run `setup_tailscale.sh` with `sudo bash setup_tailscale.sh`.
-4 If you're having a hard time Creating a Cloudflare API Token
+4. If you're having a hard time Creating a Cloudflare API Token
 * Log in to your Cloudflare dashboard.
 * Navigate to My Profile > API Tokens.
 * Click Create Token.
@@ -87,4 +87,22 @@ After `setup.sh` finishes, it automatically executes `setup_GCPTailWall.sh` with
 * Include all the zones you want Caddy to be able to issue certificates for, or select "Include all zones" if you prefer.
 * Complete the token creation process.
 
+## Questions & Answers
 
+### What is the purpose of using Caddy in this setup?
+Caddy is primarily employed as a proxy to facilitate the hosting of multiple hostnames on a single virtual machine. It is particularly advantageous due to its ability to automate the creation and renewal of SSL certificates, ensuring that even hostnames behind a Tailscale network can securely serve domain names over SSL.
+
+---
+
+### Why integrate Caddy with Cloudflare DNS in this configuration?
+This configuration aims to secure the virtual machine by closing off public ports such as 80 and 443. Utilizing the Cloudflare module with Caddy offers a reliable and secure alternative for the server to periodically connect with Cloudflare for SSL certificate renewal, without exposing these ports to the public.
+
+---
+
+### What leads to the choice of a precompiled Caddy version with Cloudflare DNS?
+The decision to opt for a precompiled version of Caddy including the Cloudflare DNS module stems from consistent difficulties encountered when attempting to compile xcaddy with the Cloudflare DNS module using go. These challenges proved insurmountable, leading to the selection of a precompiled solution to bypass these issues.
+
+---
+
+### What is the reason behind the precompiled binary being specifically set for Linux ARM64?
+The decision to hardcode the binary for Linux ARM64 is due to convenience. Modifying the setup script to detect the operating system and architecture to adjust the download URL accordingly would be a simple task. It's something I might consider implementing in the future. At present, my usage is limited to complimentary VMs that run Ubuntu. For now, I [left a comment in setup_tailscale.sh](https://github.com/danielraffel/GCPTailWall/blob/66002f2f8f7c8ac8d97fd9b9f9ebb8dcfaa6f9c3/setup_tailscale.sh#L34) where you can manually update the URL to pre-compiled binaries should you need to switch to something else.
