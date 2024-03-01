@@ -28,7 +28,8 @@ curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list
 echo "Installing Tailscale..."
 sudo apt-get update && sudo apt-get install tailscale -y
 
-# Download the custom Caddy binary
+# Download the custom Caddy binary with the Cloudflare DNS module for Caddy
+# Note: If you're running something other than Linux AMD64 you'll want to visit the following URL, copy your respective platform URL and update the file linked below https://caddyserver.com/download?package=github.com%2Fcaddy-dns%2Fcloudflare
 echo "Downloading the custom Caddy binary..."
 sudo curl -o caddy_linux_amd64_custom "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fcaddy-dns%2Fcloudflare&idempotency=90496132318341"
 
