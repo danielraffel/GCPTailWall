@@ -1,10 +1,15 @@
 #!/bin/bash
+# Uncomment the next line for some help debugging
+# set -x
+
+# Set path to the directory containing the script
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
 
 # Change directory to the script's location
 cd "$(dirname "$0")"
 
 # Load variables from variables.txt
-source variables.txt
+source "${SCRIPT_DIR}/variables.txt"
 
 # Enable IP Forwarding for the VM
 echo "Enabling IP Forwarding on the VM..."
@@ -12,6 +17,7 @@ echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
 echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
 sudo sysctl -p /etc/sysctl.d/99-tailscale.conf
 
+# Enable IP Forwarding for the VM in GCP
 gcloud compute instances add-metadata $(hostname) --metadata enable-ip-forwarding=true --zone="$ZONE" --project="$PROJECT_ID"
 
 # Install Tailscale
@@ -22,11 +28,45 @@ curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list
 echo "Installing Tailscale..."
 sudo apt-get update && sudo apt-get install tailscale -y
 
-# Install Caddy
-echo "Installing Caddy..."
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/caddy-stable.asc
-echo "deb https://dl.cloudsmith.io/public/caddy/stable/deb/debian buster main" | sudo tee /etc/apt/sources.list.d/caddy-stable.list
-sudo apt-get update && sudo apt-get install caddy -y
+# Download the custom Caddy binary
+echo "Downloading the custom Caddy binary..."
+sudo curl -o caddy_linux_amd64_custom "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fcaddy-dns%2Fcloudflare&idempotency=90496132318341"
+
+# Check if Caddy service is running and stop it if it is active
+if systemctl is-active --quiet caddy; then
+    echo "Caddy is running. Stopping Caddy service..."
+    sudo systemctl stop caddy
+fi
+
+# Move the Caddy binary and ensure it is executable
+echo "Moving the custom Caddy binary and setting it as executable..."
+sudo mv caddy_linux_amd64_custom /usr/bin/caddy
+sudo chmod +x /usr/bin/caddy
+
+# Display Caddy version to verify the move
+caddy version
+
+# Reload systemd daemon to recognize any changes to the service file
+echo "Reloading systemd daemon..."
+sudo systemctl daemon-reload
+
+# Enable Caddy service to start at boot
+echo "Enabling Caddy service to start at boot..."
+sudo systemctl enable caddy
+
+# Start Caddy service
+echo "Starting Caddy service..."
+sudo systemctl start caddy
+
+# Verify the Caddy service status
+echo "Verifying the Caddy service status..."
+if systemctl is-active --quiet caddy; then
+    echo "Caddy is running successfully."
+else
+    echo "Caddy service failed to start. Please check logs for errors: journalctl -u caddy"
+    # Optionally, output the last few lines of the Caddy log for immediate troubleshooting
+    journalctl -u caddy -n 20
+fi
 
 # Initialize variable
 CLOUDFLARE_API_ACCESS_TOKEN=""
@@ -36,7 +76,7 @@ while IFS='=' read -r key value; do
     if [[ "$key" == "CLOUDFLARE_API_ACCESS_TOKEN" ]]; then
         CLOUDFLARE_API_ACCESS_TOKEN="$value"
     fi
-done < variables.txt
+done < "${SCRIPT_DIR}/variables.txt"
 
 # Check if the token was found
 if [ -z "$CLOUDFLARE_API_ACCESS_TOKEN" ]; then
@@ -64,7 +104,8 @@ sudo cp /dev/null /etc/caddy/Caddyfile # Clear existing Caddyfile contents befor
             hostname=${BASH_REMATCH[2]}
             varname="TCP_PORT_${BASH_REMATCH[1]}"
             port=${!varname}
-            # Append site configuration with reverse proxy and TLS using DNS challenge
+            # Append site configuration with reverse proxy and TLS using Cloudflare DNS challenge
+            echo "# Configuring $hostname to proxy to port $port"
             echo "$hostname {
     reverse_proxy localhost:$port
     tls {
@@ -72,16 +113,15 @@ sudo cp /dev/null /etc/caddy/Caddyfile # Clear existing Caddyfile contents befor
     }
 }"
         fi
-    done < variables.txt
+    done < "${SCRIPT_DIR}/variables.txt"
 } | sudo tee -a /etc/caddy/Caddyfile
 
 # Reload Caddy to apply the new configuration
 echo "Reloading Caddy to apply configuration changes..."
-sudo systemctl reload caddy
 sudo caddy fmt --overwrite /etc/caddy/Caddyfile
-sudo caddy reload --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
 
-# Install jq
+# Install jq to parse JSON responses
 echo "Installing jq..."
 sudo apt-get install jq -y
 
@@ -101,8 +141,8 @@ echo "Tailscale IP: $TAILSCALE_IP"
 echo "Advertising routes..."
 sudo tailscale up --accept-dns=false --advertise-routes="$VM_SUBNET" --accept-routes --operator="$SSH_KEY_USERNAME"
 
-# Add GCE DNS for your tailnet
-echo "Adding GCE DNS for your tailnet..."
+# Add Google Compute Engine DNS for your tailnet
+echo "Adding Google Compute Engine DNS for your tailnet..."
 gcloud dns policies create inbound-dns --project="$PROJECT_ID" \
   --description="Expose DNS endpoints per subnet" \
   --networks="$YOUR_VPC" \
@@ -161,15 +201,23 @@ sudo service ssh restart
 
 # Create DNS records on Cloudflare for each hostname
 echo "Creating DNS records on Cloudflare for each hostname..."
-for i in $(seq 1 $(grep -c 'HOSTNAME_' variables.txt)); do
-    HOST_VAR="HOSTNAME_$i"
-    # Use Cloudflare API to create DNS record
-curl --request POST \
-  --url https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records \
-  --header "Content-Type: application/json" \
-  --header "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-  --header "X-Auth-Key: $CLOUDFLARE_API_ACCESS_TOKEN" \
-  --data "{\"type\":\"A\",\"name\":\"${!HOST_VAR}\",\"content\":\"$TAILSCALE_IP\",\"ttl\":3600,\"proxied\":false}"
-done
+# Loop through each line in variables.txt to find HOSTNAME_X variables
+while IFS='=' read -r key value; do
+    if [[ "$key" =~ ^HOSTNAME_([0-9]+)$ ]]; then
+        hostname="$value"
+        index="${BASH_REMATCH[1]}"
+        port_varname="TCP_PORT_$index"
+        port="${!port_varname}"
+
+        echo "Creating DNS record for $hostname with IP $TAILSCALE_IP and port $port..."
+
+        # Use Cloudflare API to create DNS record
+        curl --request POST \
+          --url https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records \
+          --header "Authorization: Bearer $CLOUDFLARE_API_ACCESS_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data "{\"type\":\"A\",\"name\":\"$hostname\",\"content\":\"$TAILSCALE_IP\",\"ttl\":3600,\"proxied\":false}"
+    fi
+done < "${SCRIPT_DIR}/variables.txt"
 
 echo "Tailscale setup and configuration complete."
