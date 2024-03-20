@@ -1,6 +1,6 @@
 # GCPTailWall README
 
-Have you ever wanted to host a Virtual Machine on Google Cloud where your Cloudflare domain is only accessible via clients on your Tailscale network? This project aims to facilliate setting up your VM with Tailscale for private networking, installing and configuring Caddy as a reverse proxy, and configure new custom Cloudflare DNS hostnames. The configuration has been tested on Ubuntu 22.04 running on an ARM64 machine.
+Have you ever wanted to host a Virtual Machine on Google Cloud where your Cloudflare domain is only accessible via clients on your Tailscale network? This project aims to facilliate setting up your VM with Tailscale for private networking, installing and configuring Caddy as a reverse proxy, and configure new custom Cloudflare DNS hostnames. The configuration has been tested on Ubuntu 22.04 running on an AMD64 machine.
 
 ## Use Case
 You aim to run a VM on GCP accessible exclusively at your.domain.com, and want to restrict access to it so that it's only available when you are connected to your Tailscale network, regardless of your location, be it at home or elsewhere.
